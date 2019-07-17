@@ -81,6 +81,9 @@ class SingleLog():
         self.vbox3.pack_start(self.lbl_res, False, False, 0)
 
         # Error row
+        self.lbl_err_title = Gtk.Label(label="Error:", xalign=0.0)
+        self.lbl_err_title.set_no_show_all(True)
+        self.lbl_err_title.get_style_context().add_class("body-title")
         self.lbl_err = Gtk.Label(label="Error: ", xalign=0.0)
         self.lbl_err.set_no_show_all(True)
 
@@ -91,6 +94,7 @@ class SingleLog():
         vbox.pack_start(hbox1, False, False, 0)
         vbox.pack_start(hbox2, False, False, 0)
         vbox.pack_start(separator, False, False, 0)
+        vbox.pack_start(self.lbl_err_title, False, False, 0)
         vbox.pack_start(self.lbl_err, False, False, 0)
         vbox.pack_start(self.vbox3, True, True, 0)
 
@@ -121,27 +125,21 @@ class SingleLog():
             df_evaluate.drop([0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13], axis=1, inplace=True)
         except ValueError:
             self.vbox3.hide()
-            self.lbl_err.set_text("Error: Valores en el registro no esperados o url inválida.")
+            self.lbl_err.set_text("Valores en el registro no esperados o url inválida.")
+            self.lbl_err_title.show()
             self.lbl_err.show()
             return -1
         except KeyError:
             self.vbox3.hide()
-            self.lbl_err.set_text("Error: Registro incompleto o url con formato inválido.")
+            self.lbl_err.set_text("Registro incompleto o url con formato inválido.")
+            self.lbl_err_title.show()
             self.lbl_err.show()
-            return -1
-        except ParserError:
-            self.vbox3.hide()
-            self.lbl_err.set_text("Error: No se pudo analizar gramaticalmente la el registro.")
-            self.lbl_err.show()
-            return -1
-        except EmptyDataError:
-            self.vbox3.hide()
-            self.lbl_err.hide()
             return -1
 
         if df_evaluate.at[0,11] != 'GET' and df_evaluate.at[0,11] != 'POST':
             self.vbox3.hide()
             self.lbl_err.set_text("Error: Método de la petición HTTP inválido o no considerado en el proyecto.")
+            self.lbl_err_title.show()
             self.lbl_err.show()
             return -1
 
@@ -184,6 +182,7 @@ class SingleLog():
         else:
             self.lbl_res.set_text('Benigno' + '   (' + str(predict) + '%)')
 
+        self.lbl_err_title.hide()
         self.lbl_err.hide()
         self.vbox3.set_no_show_all(False)
         self.vbox3.show_all()

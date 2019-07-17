@@ -3,6 +3,7 @@ import os.path
 
 import lmanager
 from lmanager.views.single_log import SingleLog
+from lmanager.views.multi_log import MultiLog
 
 class Window(Gtk.ApplicationWindow):
 
@@ -35,6 +36,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.listbox = Gtk.ListBox()
         self.listbox.set_size_request(200, -1)
+        self.listbox.connect("row-selected", self._on_select_row)
 
         scroll = Gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER,
@@ -57,6 +59,18 @@ class Window(Gtk.ApplicationWindow):
 
         return right_box
 
+    def _on_select_row(self, listbox, row):
+        if row:
+            if row.get_index() == 0:
+                print(row.get_index())
+                self.stack.set_visible_child_name('multi')
+            elif row.get_index() == 1:
+                print(row.get_index())
+                self.stack.set_visible_child_name('single')
+            else:
+                print(row.get_index())
+            # self.stack.set_visible_child_name(group)
+
     def load_model_data(self):
         def _make_items_listbox(text):
             lbl = Gtk.Label(label=text, xalign=0.0)
@@ -69,14 +83,14 @@ class Window(Gtk.ApplicationWindow):
         groups = ['Análisis unitario', 'Análisis grupal', 'Estadísticas']
         groups = sorted(groups)
         # "General" needs to be first item in sidebar
-        # groups.insert(0, groups.pop(groups.index(_("General"))))
 
         for g in groups:
             row = _make_items_listbox(g)
             self.listbox.add(row)
 
-        scroll = SingleLog().get_scroll()
-        self.stack.add_named(scroll, '')
+
+        self.stack.add_named(SingleLog().get_scroll(), 'single')
+        self.stack.add_named(MultiLog().get_scroll(), 'multi')
 
         widget = self.listbox.get_row_at_index(0)
         self.listbox.select_row(widget)
